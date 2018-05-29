@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+        <property name="javaFileEncoding" value="UTF-8"/>
+
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"></plugin>
+        <commentGenerator type="com.jungle.comment.MyCommentGenerator">
+        </commentGenerator>
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8" userId="root"
+                        password="123+">
+        </jdbcConnection>
+        <javaModelGenerator targetPackage="com.test.model" targetProject="E:// your project path">
+            <property name="enableSubPackages" value="ture"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+        <sqlMapGenerator targetPackage="com.test.dao" targetProject="E:// your project path">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.test.dao" targetProject="E:// your project path">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+        <table tableName="tb_user" domainObjectName="User">
+        </table>
+    </context>
+</generatorConfiguration>
