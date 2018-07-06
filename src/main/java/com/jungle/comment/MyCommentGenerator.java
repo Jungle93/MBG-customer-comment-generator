@@ -144,7 +144,7 @@ public class MyCommentGenerator implements CommentGenerator {
         sb.append(introspectedColumn.getRemarks());
         sb.append("。");
         field.addJavaDocLine(sb.toString());
-        field.addJavaDocLine("* <p> column == >"+introspectedColumn.getActualColumnName()+"</p>");
+        field.addJavaDocLine("* <p> column ==>"+introspectedColumn.getActualColumnName()+"</p>");
         field.addJavaDocLine(" */");
     }
 
@@ -160,7 +160,7 @@ public class MyCommentGenerator implements CommentGenerator {
         sb.append(introspectedTable.getFullyQualifiedTable());
         sb.append("。");
         field.addJavaDocLine(sb.toString());
-        field.addJavaDocLine("* <p> table == >"+introspectedTable.getFullyQualifiedTable().getIntrospectedTableName()+"</p>");
+        field.addJavaDocLine("* <p> table ==>"+introspectedTable.getFullyQualifiedTable().getDomainObjectName()+"</p>");
 
         field.addJavaDocLine(" */");
     }
