@@ -142,7 +142,9 @@ public class MyCommentGenerator implements CommentGenerator {
         field.addJavaDocLine("/**");
         sb.append(" * ");
         sb.append(introspectedColumn.getRemarks());
+        sb.append("。");
         field.addJavaDocLine(sb.toString());
+        field.addJavaDocLine("* <p> column == >"+introspectedColumn.getActualColumnName()+"</p>");
         field.addJavaDocLine(" */");
     }
 
@@ -156,7 +158,10 @@ public class MyCommentGenerator implements CommentGenerator {
         field.addJavaDocLine("/**");
         sb.append(" * ");
         sb.append(introspectedTable.getFullyQualifiedTable());
+        sb.append("。");
         field.addJavaDocLine(sb.toString());
+        field.addJavaDocLine("* <p> table == >"+introspectedTable.getFullyQualifiedTable().getIntrospectedTableName()+"</p>");
+
         field.addJavaDocLine(" */");
     }
 
@@ -167,10 +172,10 @@ public class MyCommentGenerator implements CommentGenerator {
         }
 
         topLevelClass.addJavaDocLine("/**");
-        topLevelClass.addJavaDocLine(" * @Title " + introspectedTable.getFullyQualifiedTable() + "表的实体类");
-        topLevelClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable().getDomainObjectName()+"。");//remarks 没办法使用，bug
+        topLevelClass.addJavaDocLine(" * @author jungle");
         topLevelClass.addJavaDocLine(" * @version 1.0");
-        topLevelClass.addJavaDocLine(" * @Author jungle");
+        topLevelClass.addJavaDocLine(" * @Title " + introspectedTable.getFullyQualifiedTable() + "表的实体类");
+        topLevelClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable().getDomainObjectName()+introspectedTable.getRemarks()+"。");//remarks 没办法使用，bug
         topLevelClass.addJavaDocLine(" * @Date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         topLevelClass.addJavaDocLine(" */");
     }
@@ -190,17 +195,16 @@ public class MyCommentGenerator implements CommentGenerator {
         method.addJavaDocLine("/**");
 
         StringBuilder sb = new StringBuilder();
-        sb.append(" * 获取");
+        sb.append(" * 获取").append(" ");
         sb.append(introspectedColumn.getRemarks());
-        sb.append(".");
+        sb.append("。");
 
         method.addJavaDocLine(sb.toString());
 
         sb.setLength(0);
-        sb.append(" * @return ");
-        sb.append(introspectedColumn.getActualColumnName());
-        sb.append(" ");
-        sb.append(introspectedColumn.getRemarks());
+        sb.append(" * @return {@link #");
+        sb.append(introspectedColumn.getJavaProperty());
+        sb.append("}");
         method.addJavaDocLine(sb.toString());
         method.addJavaDocLine(" */");
     }
@@ -212,15 +216,15 @@ public class MyCommentGenerator implements CommentGenerator {
         }
         method.addJavaDocLine("/**");
         StringBuilder sb = new StringBuilder();
-        sb.append(" * 设置");
+        sb.append(" * 设置").append(" ");
         sb.append(introspectedColumn.getRemarks());
-        sb.append(".");
+        sb.append("。");
 
         method.addJavaDocLine(sb.toString());
-        Parameter parm = method.getParameters().get(0);
+        Parameter param = method.getParameters().get(0);
         sb.setLength(0);
         sb.append(" * @param ");
-        sb.append(parm.getName());
+        sb.append(param.getName());
         sb.append(" ");
         sb.append(introspectedColumn.getRemarks());
         method.addJavaDocLine(sb.toString());
@@ -232,10 +236,10 @@ public class MyCommentGenerator implements CommentGenerator {
             return;
         }
         innerClass.addJavaDocLine("/**");
-        innerClass.addJavaDocLine(" * @Title " + introspectedTable.getFullyQualifiedTable() + "表的实体类");
-        innerClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable().getDomainObjectName());
+        innerClass.addJavaDocLine(" * @author jungle");
         innerClass.addJavaDocLine(" * @version 1.0");
-        innerClass.addJavaDocLine(" * @Author jungle");
+        innerClass.addJavaDocLine(" * @Title " + introspectedTable.getFullyQualifiedTable() + "表的实体类");
+        innerClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable().getDomainObjectName()+introspectedTable.getRemarks()+"。");
         innerClass.addJavaDocLine(" * @Date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         innerClass.addJavaDocLine(" */");
     }
