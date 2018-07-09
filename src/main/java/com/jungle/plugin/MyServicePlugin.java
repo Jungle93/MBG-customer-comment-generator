@@ -16,23 +16,18 @@ public class MyServicePlugin extends PluginAdapter {
     private String targetProject;
     private String serviceTargetPackage;
     private String serviceImplementPackage;
-    private ShellCallback shellCallback;
     private Logger logger = Logger.getLogger("MYLOG");
 
     public MyServicePlugin() {
-        shellCallback = new DefaultShellCallback(true);
     }
 
-    @Override
-    public boolean clientGenerated(Interface interfaze, TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-        interfaze.addJavaDocLine("/**");
-        interfaze.addJavaDocLine("*" + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + "的映射接口。");
-        interfaze.addJavaDocLine("*/");
-        interfaze.addAnnotation("@Mapper");
-        interfaze.addAnnotation("@Repository");
-        interfaze.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.annotations.Mapper"));
-        interfaze.addImportedType(new FullyQualifiedJavaType("org.springframework.stereotype.Repository"));
-        return super.clientGenerated(interfaze, topLevelClass, introspectedTable);
+    /**
+     * 获取 。
+     *
+     * @return {@link #targetProject}
+     */
+    public String getTargetProject() {
+        return targetProject;
     }
 
     @Override
@@ -86,8 +81,62 @@ public class MyServicePlugin extends PluginAdapter {
             serviceJavaFiles.add(serviceJavaFile);
             serviceJavaFiles.add(serviceImplJavaFile);
         }
-
-
         return serviceJavaFiles;
+    }
+
+    /**
+     * to generate service by using introspectedTable
+     *
+     * @param introspectedTable {@link IntrospectedTable}
+     * @return {@link Interface}
+     */
+    private Interface generateServiceInterface(IntrospectedTable introspectedTable) {
+
+        String domainObjectName = introspectedTable.getFullyQualifiedTable().getDomainObjectName();
+        if (validate(null) && StringUtils.isNotEmpty(domainObjectName)) {
+            String qualifiedName = serviceTargetPackage + "." + domainObjectName + "Service";
+            Interface serviceInterface = new Interface(qualifiedName);
+
+            // visibility
+            serviceInterface.setVisibility(JavaVisibility.PUBLIC);
+
+            //doc line
+            serviceInterface.addJavaDocLine("/**");
+            serviceInterface.addJavaDocLine("* basic service of " + domainObjectName + ".");
+            serviceInterface.addJavaDocLine("*/");
+
+            return serviceInterface;
+        }
+        return null;
+    }
+
+    private TopLevelClass generateServiceImplementClass(IntrospectedTable introspectedTable, Interface serviceInterface) {
+
+        if (validate(null) && serviceInterface != null) {
+            String qualifiedName = serviceInterface.getType().getShortName() + "Impl";
+            TopLevelClass serviceImplementClass = new TopLevelClass(qualifiedName);
+            serviceImplementClass.addSuperInterface(serviceInterface.getType());
+
+            serviceImplementClass.addAnnotation("@Service");
+
+
+            serviceImplementClass.addJavaDocLine("/**");
+            serviceImplementClass.addJavaDocLine("* implementation of " + serviceInterface.getType());
+            serviceImplementClass.addJavaDocLine("*/");
+
+            Field mapperField = new Field("mapper", new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType()));
+            mapperField.setVisibility(JavaVisibility.PRIVATE);
+            mapperField.addAnnotation("@Autowired");
+            mapperField.addJavaDocLine("/**");
+            mapperField.addJavaDocLine("* mapper 层支持。");
+            mapperField.addJavaDocLine("*/");
+
+            serviceImplementClass.addImportedType("org.springframework.stereotype.Service");
+            serviceImplementClass.addImportedType("org.springframework.beans.factory.annotation.Autowired");
+
+            return serviceImplementClass;
+        }
+
+        return null;
     }
 }
