@@ -1,12 +1,12 @@
 package com.jungle.plugin;
 
 import com.jungle.util.StringUtils;
-import org.mybatis.generator.api.*;
+import org.mybatis.generator.api.GeneratedJavaFile;
+import org.mybatis.generator.api.IntrospectedTable;
+import org.mybatis.generator.api.JavaFormatter;
+import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.*;
-import org.mybatis.generator.exception.ShellException;
-import org.mybatis.generator.internal.DefaultShellCallback;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -30,6 +30,12 @@ public class MyServicePlugin extends PluginAdapter {
         return targetProject;
     }
 
+    /**
+     * validate if configuration of the plugin is correct.
+     *
+     * @param list List String
+     * @return boolean
+     */
     @Override
     public boolean validate(List<String> list) {
         targetProject = properties.getProperty("serviceTargetProject");
@@ -38,50 +44,31 @@ public class MyServicePlugin extends PluginAdapter {
         return StringUtils.isNotEmpty(targetProject) && StringUtils.isNotEmpty(serviceTargetPackage) && StringUtils.isNotEmpty(serviceImplementPackage);
     }
 
+    /**
+     * create additional Java Files
+     *
+     * @param introspectedTable {@link IntrospectedTable}
+     * @return List {@link GeneratedJavaFile}
+     */
     @Override
     public List<GeneratedJavaFile> contextGenerateAdditionalJavaFiles(IntrospectedTable introspectedTable) {
 
-        /*
-        步骤：
-        1、生成Service Interface
-        2、生成ServiceImpl
-        3、为ServiceImpl添加Mapper字段
-         */
-        List<GeneratedJavaFile> serviceJavaFiles = new ArrayList<GeneratedJavaFile>();
-        String beanName = introspectedTable.getFullyQualifiedTable().getDomainObjectName();
+        List<GeneratedJavaFile> javaFiles = new ArrayList<GeneratedJavaFile>();
         JavaFormatter javaFormatter = context.getJavaFormatter();
-        if (StringUtils.isNotEmpty(beanName) && StringUtils.isNotEmpty(serviceTargetPackage)) {
-            //[step.1] add service interface
-            Interface serviceInterface = new Interface(
-                    serviceTargetPackage + "." + beanName + "Service");
-            serviceInterface.setVisibility(JavaVisibility.PUBLIC);
-            serviceInterface.addJavaDocLine("/**");
-            serviceInterface.addJavaDocLine(" * " + beanName + "服务层。");
-            serviceInterface.addJavaDocLine(" */");
-            GeneratedJavaFile serviceJavaFile = new GeneratedJavaFile(serviceInterface, targetProject, "utf-8", javaFormatter);
-            //[step.2] add service implement
-            FullyQualifiedJavaType serviceImplType = new FullyQualifiedJavaType(serviceImplementPackage + "." + serviceInterface.getType().getShortName() + "Impl");
-            //[step.3] add service implement mapper field
-            TopLevelClass serviceImplementJavaFile = new TopLevelClass(serviceImplType);
-            serviceImplementJavaFile.addAnnotation("@Service");
-            serviceImplementJavaFile.addSuperInterface(serviceInterface.getType());
-            serviceImplementJavaFile.addImportedType("org.springframework.stereotype.Service");
-            serviceImplementJavaFile.addImportedType("org.springframework.beans.factory.annotation.Autowired");
-            serviceImplementJavaFile.addJavaDocLine("/**");
-            serviceImplementJavaFile.addJavaDocLine("*" + serviceInterface.getType().getShortName() + "的实现类。");
-            serviceImplementJavaFile.addJavaDocLine("*/");
-            Field mapper = new Field("mapper", new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType()));
-            mapper.setVisibility(JavaVisibility.PRIVATE);
-            mapper.addAnnotation("@Autowired");
-            mapper.addJavaDocLine("/**");
-            mapper.addJavaDocLine("* Mapper 层支持。");
-            mapper.addJavaDocLine("*/");
-            serviceImplementJavaFile.addField(mapper);
-            GeneratedJavaFile serviceImplJavaFile = new GeneratedJavaFile(serviceImplementJavaFile, targetProject, "utf-8", javaFormatter);
-            serviceJavaFiles.add(serviceJavaFile);
-            serviceJavaFiles.add(serviceImplJavaFile);
+
+        if (validate(null)) {
+            Interface serviceInterface = generateServiceInterface(introspectedTable);
+            if (serviceInterface != null) {
+                GeneratedJavaFile serviceJavaFile = new GeneratedJavaFile(serviceInterface, targetProject, "utf-8", javaFormatter);
+                javaFiles.add(serviceJavaFile);
+                TopLevelClass serviceImplementClass = generateServiceImplementClass(introspectedTable, serviceInterface);
+                if (serviceImplementClass != null) {
+                    GeneratedJavaFile serviceImplementJavaFile = new GeneratedJavaFile(serviceImplementClass, targetProject, "utf-8", javaFormatter);
+                    javaFiles.add(serviceImplementJavaFile);
+                }
+            }
         }
-        return serviceJavaFiles;
+        return javaFiles;
     }
 
     /**
@@ -110,6 +97,13 @@ public class MyServicePlugin extends PluginAdapter {
         return null;
     }
 
+    /**
+     * generate a service implementation class.
+     *
+     * @param introspectedTable table
+     * @param serviceInterface  service interface
+     * @return {@link TopLevelClass}
+     */
     private TopLevelClass generateServiceImplementClass(IntrospectedTable introspectedTable, Interface serviceInterface) {
 
         if (validate(null) && serviceInterface != null) {
