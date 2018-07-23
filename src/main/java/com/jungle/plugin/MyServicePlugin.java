@@ -107,7 +107,7 @@ public class MyServicePlugin extends PluginAdapter {
     private TopLevelClass generateServiceImplementClass(IntrospectedTable introspectedTable, Interface serviceInterface) {
 
         if (validate(null) && serviceInterface != null) {
-            String qualifiedName = serviceInterface.getType().getShortName() + "Impl";
+            String qualifiedName = serviceImplementPackage+"."+serviceInterface.getType().getShortName() + "Impl";
             TopLevelClass serviceImplementClass = new TopLevelClass(qualifiedName);
             serviceImplementClass.addSuperInterface(serviceInterface.getType());
 
@@ -124,6 +124,7 @@ public class MyServicePlugin extends PluginAdapter {
             mapperField.addJavaDocLine("/**");
             mapperField.addJavaDocLine("* mapper 层支持。");
             mapperField.addJavaDocLine("*/");
+            serviceImplementClass.addField(mapperField);
 
             serviceImplementClass.addImportedType("org.springframework.stereotype.Service");
             serviceImplementClass.addImportedType("org.springframework.beans.factory.annotation.Autowired");
