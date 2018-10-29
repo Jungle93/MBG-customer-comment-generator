@@ -3,7 +3,14 @@ package com.jungle.comment;
 import org.mybatis.generator.api.CommentGenerator;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
-import org.mybatis.generator.api.dom.java.*;
+import org.mybatis.generator.api.dom.java.CompilationUnit;
+import org.mybatis.generator.api.dom.java.Field;
+import org.mybatis.generator.api.dom.java.InnerClass;
+import org.mybatis.generator.api.dom.java.InnerEnum;
+import org.mybatis.generator.api.dom.java.JavaElement;
+import org.mybatis.generator.api.dom.java.Method;
+import org.mybatis.generator.api.dom.java.Parameter;
+import org.mybatis.generator.api.dom.java.TopLevelClass;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.mybatis.generator.config.MergeConstants;
 import org.mybatis.generator.config.PropertyRegistry;
@@ -144,7 +151,7 @@ public class MyCommentGenerator implements CommentGenerator {
         sb.append(introspectedColumn.getRemarks());
         sb.append("。");
         field.addJavaDocLine(sb.toString());
-        field.addJavaDocLine("* <p> column ==>"+introspectedColumn.getActualColumnName()+"</p>");
+        field.addJavaDocLine("* <p> column ==>" + introspectedColumn.getActualColumnName() + "</p>");
         field.addJavaDocLine(" */");
     }
 
@@ -160,7 +167,7 @@ public class MyCommentGenerator implements CommentGenerator {
         sb.append(introspectedTable.getFullyQualifiedTable());
         sb.append("。");
         field.addJavaDocLine(sb.toString());
-        field.addJavaDocLine("* <p> table ==>"+introspectedTable.getFullyQualifiedTable().getDomainObjectName()+"</p>");
+        field.addJavaDocLine("* <p> table ==>" + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + "</p>");
 
         field.addJavaDocLine(" */");
     }
@@ -172,10 +179,11 @@ public class MyCommentGenerator implements CommentGenerator {
         }
 
         topLevelClass.addJavaDocLine("/**");
+        topLevelClass.addJavaDocLine(" *" + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + introspectedTable.getRemarks() + "。");
         topLevelClass.addJavaDocLine(" * @author jungle");
         topLevelClass.addJavaDocLine(" * @version 1.0");
         topLevelClass.addJavaDocLine(" * @Title " + introspectedTable.getFullyQualifiedTable() + "表的实体类");
-        topLevelClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable().getDomainObjectName()+introspectedTable.getRemarks()+"。");//remarks 没办法使用，bug
+        topLevelClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + introspectedTable.getRemarks() + "。");//remarks 没办法使用，bug
         topLevelClass.addJavaDocLine(" * @Date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         topLevelClass.addJavaDocLine(" */");
     }
@@ -227,6 +235,9 @@ public class MyCommentGenerator implements CommentGenerator {
         sb.append(param.getName());
         sb.append(" ");
         sb.append(introspectedColumn.getRemarks());
+        sb.append(" {@link #");
+        sb.append(introspectedColumn.getJavaProperty());
+        sb.append("}");
         method.addJavaDocLine(sb.toString());
         method.addJavaDocLine(" */");
     }
@@ -236,13 +247,12 @@ public class MyCommentGenerator implements CommentGenerator {
             return;
         }
         innerClass.addJavaDocLine("/**");
+        innerClass.addJavaDocLine(" *" + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + introspectedTable.getRemarks() + "。");
         innerClass.addJavaDocLine(" * @author jungle");
         innerClass.addJavaDocLine(" * @version 1.0");
         innerClass.addJavaDocLine(" * @Title " + introspectedTable.getFullyQualifiedTable() + "表的实体类");
-        innerClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable().getDomainObjectName()+introspectedTable.getRemarks()+"。");
+        innerClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + introspectedTable.getRemarks() + "。");
         innerClass.addJavaDocLine(" * @Date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         innerClass.addJavaDocLine(" */");
     }
-
-
 }
