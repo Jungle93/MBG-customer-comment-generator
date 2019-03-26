@@ -182,9 +182,8 @@ public class MyCommentGenerator implements CommentGenerator {
         topLevelClass.addJavaDocLine(" *" + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + introspectedTable.getRemarks() + "。");
         topLevelClass.addJavaDocLine(" * @author jungle");
         topLevelClass.addJavaDocLine(" * @version 1.0");
-        topLevelClass.addJavaDocLine(" * @Title " + introspectedTable.getFullyQualifiedTable() + "表的实体类");
-        topLevelClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + introspectedTable.getRemarks() + "。");//remarks 没办法使用，bug
-        topLevelClass.addJavaDocLine(" * @Date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        topLevelClass.addJavaDocLine(" * @Description "+ introspectedTable.getFullyQualifiedTable() + "表的实体类," + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + introspectedTable.getRemarks() + "。");//remarks 没办法使用，bug
+        topLevelClass.addJavaDocLine(" * " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         topLevelClass.addJavaDocLine(" */");
     }
 
@@ -250,9 +249,8 @@ public class MyCommentGenerator implements CommentGenerator {
         innerClass.addJavaDocLine(" *" + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + introspectedTable.getRemarks() + "。");
         innerClass.addJavaDocLine(" * @author jungle");
         innerClass.addJavaDocLine(" * @version 1.0");
-        innerClass.addJavaDocLine(" * @Title " + introspectedTable.getFullyQualifiedTable() + "表的实体类");
-        innerClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + introspectedTable.getRemarks() + "。");
-        innerClass.addJavaDocLine(" * @Date " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        innerClass.addJavaDocLine(" * @Description " + introspectedTable.getFullyQualifiedTable() + "表的实体类," + introspectedTable.getFullyQualifiedTable().getDomainObjectName() + introspectedTable.getRemarks() + "。");
+        innerClass.addJavaDocLine(" * "+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         innerClass.addJavaDocLine(" */");
     }
 }
